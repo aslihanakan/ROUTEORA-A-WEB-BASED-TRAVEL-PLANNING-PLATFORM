@@ -1,0 +1,381 @@
+@model TravelPlanner.Models.Destination
+@{
+    ViewData["Title"] = Model.CityName;
+    bool loggedIn = Context.Session.GetInt32("UserId") != null;
+
+    // Per-city data as separate typed variables to avoid tuple deconstruction issues in Razor
+    string[] attractions;
+    string[] activities;
+    string accommodation;
+    string food;
+    string transport;
+    string dailyBudget;
+    string totalAvg;
+
+    switch (Model.CityName)
+    {
+        case "Istanbul":
+            attractions   = new[]{"Hagia Sophia","Topkapi Palace","Grand Bazaar","Bosphorus Cruise","Blue Mosque","Galata Tower"};
+            activities    = new[]{"Bosphorus boat tour","Turkish bath (hammam)","Spice Market visit","Walking Beyoğlu","Sunset at Pierre Loti Hill"};
+            accommodation = "Hostel $15–30/night · Boutique hotel $60–120/night · Luxury hotel $150–400/night";
+            food          = "Street food $3–5 · Mid-range restaurant $10–20/person · Seafood restaurant $25–50/person";
+            transport     = "Metro/Tram $0.60/ride · Daily card $3 · Taxi $5–15";
+            dailyBudget   = "~$60–100/day";
+            totalAvg      = "7-Day Average: $500–800";
+            break;
+        case "Cappadocia":
+            attractions   = new[]{"Göreme Open Air Museum","Derinkuyu Underground City","Uçhisar Castle","Rose Valley","Devrent Valley"};
+            activities    = new[]{"Hot air balloon ride","ATV tour","Pottery workshop","Sunset hike Red Valley","Cave hotel stay"};
+            accommodation = "Cave hostel $20–40/night · Cave boutique $80–150/night · Luxury cave $200–500/night";
+            food          = "Tandır kebab $8–12 · Güveç stew $10–15 · Local breakfast $6–10";
+            transport     = "Kayseri/Nevşehir flight $40–80 · Shuttle minibus $5–10 · ATV rental $30/day";
+            dailyBudget   = "~$80–130/day";
+            totalAvg      = "5-Day Average: $500–700";
+            break;
+        case "Trabzon":
+            attractions   = new[]{"Sümela Monastery","Uzungöl Lake","Trabzon Museum","Atatürk Köşkü","Boztepe Hill"};
+            activities    = new[]{"Sümela Monastery visit","Uzungöl boat tour","Kuymak tasting","Tea plantation tour","Akçaabat meatball experience"};
+            accommodation = "Guesthouse $20–35/night · Mid-range hotel $50–90/night · Luxury $100–180/night";
+            food          = "Pide & kuymak $5–8 · Mid restaurant $10–18 · Black Sea fish $15–30";
+            transport     = "Bus from Istanbul $15–25 · Domestic flight $30–70 · City bus $0.50";
+            dailyBudget   = "~$50–80/day";
+            totalAvg      = "4-Day Average: $250–400";
+            break;
+        case "Tokyo":
+            attractions   = new[]{"Senso-ji Temple","Shibuya Crossing","Shinjuku Gyoen","teamLab Borderless","Meiji Shrine","Akihabara"};
+            activities    = new[]{"Sushi breakfast at Tsukiji","Day trip to Nikko","Tokyo tower night view","Sumo tournament","Harajuku fashion walk"};
+            accommodation = "Capsule hotel $30–50/night · Business hotel $80–150/night · Luxury $250–600/night";
+            food          = "Ramen $8–12 · Sushi set $20–40 · Izakaya dinner $25–50/person";
+            transport     = "IC card (Suica) $2–5/ride · Day pass $8 · Shinkansen $50–150";
+            dailyBudget   = "~$100–180/day";
+            totalAvg      = "7-Day Average: $900–1,500";
+            break;
+        case "Osaka":
+            attractions   = new[]{"Osaka Castle","Dotonbori","Universal Studios Japan","Shinsekai","Namba","Kuromon Market"};
+            activities    = new[]{"Takoyaki food tour","Osaka Castle morning walk","Night cruise on Okawa","Karaoke in Shinsaibashi","Day trip to Nara"};
+            accommodation = "Hostel $25–45/night · Business hotel $70–130/night · Luxury $200–500/night";
+            food          = "Takoyaki $4–6 · Okonomiyaki $8–14 · Kaiseki dinner $60–120";
+            transport     = "Osaka 1-day pass $6 · Shinkansen to Kyoto $15 · Taxi $10–25";
+            dailyBudget   = "~$90–160/day";
+            totalAvg      = "5-Day Average: $600–950";
+            break;
+        case "Kyoto":
+            attractions   = new[]{"Fushimi Inari","Kinkaku-ji (Golden Pavilion)","Arashiyama Bamboo Grove","Nijo Castle","Gion District","Philosopher's Path"};
+            activities    = new[]{"Tea ceremony","Geisha district walk","Zen garden meditation","Kimono rental","Nishiki Market food tour"};
+            accommodation = "Guesthouse $30–60/night · Ryokan $120–300/night · Luxury hotel $250–600/night";
+            food          = "Tofu kaiseki $20–50 · Ramen $8–12 · Convenience store $5–10";
+            transport     = "City bus day pass $5.50 · Bicycle rental $8/day · Taxi $15–30";
+            dailyBudget   = "~$90–160/day";
+            totalAvg      = "4-Day Average: $450–750";
+            break;
+        case "Rome":
+            attractions   = new[]{"Colosseum","Vatican Museums","Trevi Fountain","Pantheon","Borghese Gallery","Palatine Hill"};
+            activities    = new[]{"Colosseum skip-the-line tour","Vatican guided tour","Gelato walk Trastevere","Cooking class","Vespa city tour"};
+            accommodation = "Hostel $20–40/night · Mid hotel $80–150/night · Boutique $180–400/night";
+            food          = "Pizza al taglio $3–5 · Trattoria dinner $15–30 · Fine dining $60–120";
+            transport     = "Metro/Bus $1.50/ride · 48h city pass $12 · Taxi €10–20";
+            dailyBudget   = "~$80–140/day";
+            totalAvg      = "5-Day Average: $500–800";
+            break;
+        case "Venice":
+            attractions   = new[]{"St. Mark's Basilica","Doge's Palace","Grand Canal","Rialto Market","Murano Island","Burano Island"};
+            activities    = new[]{"Gondola ride","Traghetto ferry crossing","Glass-blowing workshop","Carnival mask class","Lagoon island hopping"};
+            accommodation = "Budget hotel $70–120/night · Mid hotel $130–250/night · Luxury $300–800/night";
+            food          = "Cicchetti (bar snacks) $2–4 · Osteria lunch $18–30 · Fine dining $70–150";
+            transport     = "Vaporetto 24h pass $25 · Water taxi €60+ · Walking (free)";
+            dailyBudget   = "~$120–200/day";
+            totalAvg      = "3-Day Average: $450–700";
+            break;
+        case "Milan":
+            attractions   = new[]{"The Last Supper (Da Vinci)","Duomo di Milano","Brera Art Gallery","Sforza Castle","Galleria Vittorio Emanuele II","Navigli canals"};
+            activities    = new[]{"Duomo rooftop walk","Aperitivo in Navigli","Fashion district window shopping","La Scala opera evening","Day trip to Lake Como"};
+            accommodation = "Hostel $25–45/night · Mid hotel $90–170/night · Luxury $250–600/night";
+            food          = "Aperitivo buffet $10–15 · Trattoria $18–35 · Michelin restaurant $100+";
+            transport     = "Metro/tram $2/ride · Day pass $7 · Taxi €12–25";
+            dailyBudget   = "~$90–160/day";
+            totalAvg      = "4-Day Average: $450–750";
+            break;
+        case "Barcelona":
+            attractions   = new[]{"Sagrada Família","Park Güell","Casa Batlló","La Rambla","Gothic Quarter","Barceloneta Beach"};
+            activities    = new[]{"Sagrada Família guided tour","Gaudí architecture walk","Tapas bar crawl in El Born","Flamenco show","Day trip to Montserrat"};
+            accommodation = "Hostel $20–40/night · Mid hotel $70–130/night · Boutique $150–400/night";
+            food          = "Tapas $3–6 each · Set lunch menu $12–18 · Seafood dinner $30–60";
+            transport     = "T-Casual 10-trip card $12 · Airport bus $6 · Taxi €20–30";
+            dailyBudget   = "~$80–140/day";
+            totalAvg      = "5-Day Average: $500–800";
+            break;
+        case "Madrid":
+            attractions   = new[]{"Prado Museum","Reina Sofía Museum","Royal Palace","Retiro Park","Puerta del Sol","Gran Vía"};
+            activities    = new[]{"Prado morning tour","Tapas crawl La Latina","Bernabéu stadium tour","El Rastro Sunday market","Day trip to Toledo"};
+            accommodation = "Hostel $18–35/night · Mid hotel $65–120/night · Luxury $180–400/night";
+            food          = "Bocadillo $4–6 · Tapas bar $10–20 · Fine dining $50–100";
+            transport     = "Metro 10-trip $12 · Tourist pass 3-day $18 · Taxi €10–20";
+            dailyBudget   = "~$70–130/day";
+            totalAvg      = "5-Day Average: $450–750";
+            break;
+        case "Seville":
+            attractions   = new[]{"Alcázar Palace","Seville Cathedral","Plaza de España","Triana neighbourhood","Torre del Oro","Metropol Parasol"};
+            activities    = new[]{"Flamenco show","Alcázar gardens stroll","Tapas bar hopping","Horse carriage tour","Day trip to Ronda"};
+            accommodation = "Hostel $15–30/night · Mid hotel $55–110/night · Boutique $130–300/night";
+            food          = "Tapas $2–4 each · Set lunch $10–15 · Traditional dinner $25–50";
+            transport     = "Tram/bus €1.40/ride · Bike rental $10/day · Taxi €8–15";
+            dailyBudget   = "~$60–110/day";
+            totalAvg      = "4-Day Average: $320–550";
+            break;
+        case "Seoul":
+            attractions   = new[]{"Gyeongbokgung Palace","N Seoul Tower","Bukchon Hanok Village","Myeongdong","DMZ Tour","Lotte World"};
+            activities    = new[]{"Han River picnic","K-pop idol café","Cooking class (kimchi)","Night markets Dongdaemun","Day trip to Incheon"};
+            accommodation = "Guesthouse $25–45/night · Business hotel $70–130/night · Luxury $200–500/night";
+            food          = "Korean BBQ $15–25 · Street food $3–6 · Fine dining $50–100";
+            transport     = "T-Money card $1–2/ride · Airport train $9 · Taxi $6–15";
+            dailyBudget   = "~$70–130/day";
+            totalAvg      = "6-Day Average: $550–900";
+            break;
+        case "Busan":
+            attractions   = new[]{"Haeundae Beach","Gamcheon Culture Village","Haedong Yonggungsa Temple","Jagalchi Fish Market","Gwangalli Beach","BIFF Square"};
+            activities    = new[]{"Sunrise at Haedong Temple","Seafood market breakfast","Gamcheon village walk","Night beach walk Gwangalli","Spa in Haeundae"};
+            accommodation = "Guesthouse $20–40/night · Mid hotel $60–110/night · Beachfront $150–350/night";
+            food          = "Ssiat hotteok $1–2 · Seafood stew $10–20 · Korean BBQ $15–25";
+            transport     = "Metro $1.20/ride · Bus $1 · Taxi $5–12";
+            dailyBudget   = "~$55–100/day";
+            totalAvg      = "4-Day Average: $300–500";
+            break;
+        case "Gyeongju":
+            attractions   = new[]{"Bulguksa Temple","Seokguram Grotto","Tumuli Park (Royal Tombs)","Anapji Pond","Cheomseongdae Observatory","Gyerim Forest"};
+            activities    = new[]{"Bicycle tour royal tombs","Bulguksa early morning visit","Traditional hanbok walk","Night illuminations Anapji","Local rice wine tasting"};
+            accommodation = "Guesthouse $18–35/night · Hanok stay $50–100/night · Resort $120–250/night";
+            food          = "Ssambap (leaf wrap) $8–12 · Bibimbap $7–10 · Traditional set $15–25";
+            transport     = "KTX from Seoul $20–30 · City bus $1 · Bicycle rental $5/day";
+            dailyBudget   = "~$45–80/day";
+            totalAvg      = "3-Day Average: $200–350";
+            break;
+        case "Bangkok":
+            attractions   = new[]{"Grand Palace & Wat Phra Kaew","Wat Pho (Reclining Buddha)","Chatuchak Weekend Market","Wat Arun","Khao San Road","Lumphini Park"};
+            activities    = new[]{"Chao Phraya river cruise","Thai cooking class","Floating market day trip","Rooftop bar sunset","Muay Thai match"};
+            accommodation = "Hostel $10–20/night · Mid hotel $35–70/night · Luxury $100–300/night";
+            food          = "Street pad thai $2–3 · Food court $4–8 · Fine dining $30–80";
+            transport     = "BTS Skytrain $0.60–2 · Tuk-tuk $3–8 · Grab taxi $3–10";
+            dailyBudget   = "~$40–80/day";
+            totalAvg      = "7-Day Average: $380–650";
+            break;
+        case "Chiang Mai":
+            attractions   = new[]{"Doi Suthep Temple","Elephant Sanctuary","Old City Moat","Night Bazaar","Doi Inthanon National Park","Sunday Walking Street"};
+            activities    = new[]{"Ethical elephant sanctuary","Thai cooking class","Monk chat at temple","Zipline in jungle","Night market food tour"};
+            accommodation = "Guesthouse $8–18/night · Boutique hotel $30–70/night · Luxury resort $100–250/night";
+            food          = "Khao soi $2–3 · Night market $3–6 · Restaurant $8–20";
+            transport     = "Red songthaew $1–2 · Scooter rental $6/day · Grab $3–8";
+            dailyBudget   = "~$30–60/day";
+            totalAvg      = "6-Day Average: $260–450";
+            break;
+        case "Phuket":
+            attractions   = new[]{"Phi Phi Islands","Big Buddha","Patong Beach","Old Phuket Town","James Bond Island","Phang Nga Bay"};
+            activities    = new[]{"Phi Phi snorkeling day trip","Elephant sanctuary visit","ATV jungle ride","Sunset sailing tour","Thai cooking class"};
+            accommodation = "Guesthouse $15–35/night · Beach hotel $50–120/night · Luxury resort $200–600/night";
+            food          = "Street pad see ew $2–4 · Beach bar $8–15 · Seafood dinner $20–50";
+            transport     = "Tuk-tuk $3–6 · Scooter $8/day · Long-tail boat $15–40";
+            dailyBudget   = "~$50–100/day";
+            totalAvg      = "5-Day Average: $350–600";
+            break;
+        case "Moscow":
+            attractions   = new[]{"Red Square & Kremlin","St. Basil's Cathedral","Bolshoi Theatre","Tretyakov Gallery","Gorky Park","GUM Department Store"};
+            activities    = new[]{"Kremlin guided tour","Ballet at Bolshoi","Metro station art tour","Boat cruise on Moscow River","VDNKH Soviet park walk"};
+            accommodation = "Hostel $15–30/night · Mid hotel $60–120/night · Luxury $200–500/night";
+            food          = "Stolovaya (canteen) $5–8 · Restaurant $15–30 · Fine dining $60–120";
+            transport     = "Metro $1/ride · Day pass $3.50 · Taxi $5–15";
+            dailyBudget   = "~$60–120/day";
+            totalAvg      = "5-Day Average: $400–700";
+            break;
+        case "St. Petersburg":
+            attractions   = new[]{"Hermitage Museum","Church on Spilled Blood","Peterhof Palace","Peter & Paul Fortress","Russian Museum","Nevsky Prospekt"};
+            activities    = new[]{"Hermitage 2-day pass","White Nights canal cruise","Peterhof fountains day trip","Ballet at Mariinsky","Dostoevsky literary walk"};
+            accommodation = "Hostel $15–28/night · Mid hotel $55–110/night · Luxury $180–450/night";
+            food          = "Pelmeni $5–8 · Borscht lunch $6–10 · Restaurant dinner $18–40";
+            transport     = "Metro $0.80/ride · Marshrutka $0.60 · Taxi $5–12";
+            dailyBudget   = "~$55–110/day";
+            totalAvg      = "5-Day Average: $360–650";
+            break;
+        case "Novosibirsk":
+            attractions   = new[]{"Novosibirsk Opera House","Akademgorodok Science Town","Ob Sea Reservoir","Novosibirsk Zoo","Trans-Siberian Railway Museum","Lenin Square"};
+            activities    = new[]{"Trans-Siberian Railway leg","Opera & Ballet evening","Akademgorodok walk","Ob River boat trip","Siberian folk museum visit"};
+            accommodation = "Hostel $10–20/night · Mid hotel $40–80/night · Luxury $120–250/night";
+            food          = "Canteen meal $4–7 · Café lunch $7–12 · Restaurant dinner $15–30";
+            transport     = "Metro $0.50/ride · Tram $0.40 · Taxi $3–10";
+            dailyBudget   = "~$40–80/day";
+            totalAvg      = "4-Day Average: $220–400";
+            break;
+        case "Zurich":
+            attractions   = new[]{"Zurich Old Town (Altstadt)","Lake Zurich Promenade","Swiss National Museum","Kunsthaus Art Museum","Uetliberg Mountain","Bahnhofstrasse"};
+            activities    = new[]{"Lake boat cruise","Fondue dinner in old town","Day trip to Rhine Falls","Chocolate factory tour","Night at Langstrasse district"};
+            accommodation = "Hostel $45–80/night · Mid hotel $150–250/night · Luxury $350–800/night";
+            food          = "Kebab/cheap eat $8–12 · Restaurant $25–50 · Fine dining $80–200";
+            transport     = "ZVV day pass $13.20 · Airport train $3.60 · Taxi CHF20–40";
+            dailyBudget   = "~$150–280/day";
+            totalAvg      = "4-Day Average: $750–1,200";
+            break;
+        case "Zermatt":
+            attractions   = new[]{"Matterhorn Glacier Paradise","Gorner Gorge","Zermatt Village","Schwarzsee Lake","Rothorn Peak","Sunnega Paradise"};
+            activities    = new[]{"Skiing/snowboarding (winter)","Hiking Matterhorn trails (summer)","Glacier Palace ice caves","Mountain bike tours","Spa & wellness"};
+            accommodation = "Mountain hostel $50–90/night · Chalet $150–300/night · Luxury $400–1000/night";
+            food          = "Fondue $25–40 · Mountain restaurant $30–55 · Fine dining $80–160";
+            transport     = "Cog railway from Täsch $12 · Zonal ski pass $75/day · Cable car $35–80";
+            dailyBudget   = "~$180–350/day";
+            totalAvg      = "4-Day Average: $900–1,600";
+            break;
+        case "Bern":
+            attractions   = new[]{"Bern Old Town (UNESCO)","Bear Park","Rose Garden","Clock Tower (Zytglogge)","Einstein House","Federal Palace"};
+            activities    = new[]{"Old town arcaded streets walk","Bear Park visit","Gurten hill panorama","Chocolate & cheese tasting","Day trip to Grindelwald"};
+            accommodation = "Hostel $40–70/night · Mid hotel $120–220/night · Luxury $280–600/night";
+            food          = "Rösti & sausage $12–18 · Restaurant $22–45 · Fine dining $70–150";
+            transport     = "City tram/bus day pass $9 · Regional train $15–30 · Taxi CHF15–30";
+            dailyBudget   = "~$130–250/day";
+            totalAvg      = "3-Day Average: $500–850";
+            break;
+        default:
+            attractions   = new[]{"City Centre","Main Museum","Historic District","Local Market","Famous Viewpoint"};
+            activities    = new[]{"City walking tour","Museum visits","Local food experience","Day trips"};
+            accommodation = "Budget $15–40/night · Mid-range $60–120/night · Luxury $150–400/night";
+            food          = "Street food $2–5 · Mid-range restaurant $10–20 · Fine dining $40–80";
+            transport     = "Public transit $1–3/ride · Day pass $5–10 · Taxi $5–15";
+            dailyBudget   = "~$60–120/day";
+            totalAvg      = "7-Day Average: $500–1,000";
+            break;
+    }
+}
+
+<!-- Hero image -->
+@if (!string.IsNullOrEmpty(Model.ImageUrl))
+{
+    <div style="height:420px;overflow:hidden;position:relative;">
+        <img src="@Model.ImageUrl" class="w-100 h-100" style="object-fit:cover;object-position:center;" alt="@Model.CityName" />
+        <div style="position:absolute;inset:0;background:linear-gradient(to bottom,transparent 40%,rgba(10,31,78,0.85));display:flex;align-items:flex-end;">
+            <div class="container pb-4">
+                <h1 class="display-4 fw-bold text-white mb-1">@Model.CityName</h1>
+                <p class="text-white-50 mb-0"><i class="bi bi-geo-alt me-1"></i>@Model.CountryName &nbsp;·&nbsp;
+                   <i class="bi bi-sun me-1"></i>Best season: @Model.BestSeason &nbsp;·&nbsp;
+                   <i class="bi bi-wallet2 me-1"></i>From $@Model.EstimatedBudget</p>
+            </div>
+        </div>
+    </div>
+}
+
+<div class="container py-5">
+    <div class="row g-4">
+
+        <!-- LEFT: description + attractions + activities -->
+        <div class="col-lg-8">
+
+            <!-- Description -->
+            <div class="card dest-card mb-4 p-4">
+                <h5 class="fw-bold mb-2"><i class="bi bi-info-circle me-2 text-primary"></i>About @Model.CityName</h5>
+                <p class="mb-0">@Model.Description</p>
+            </div>
+
+            <!-- Top Attractions -->
+            <div class="card dest-card mb-4 p-4">
+                <h5 class="fw-bold mb-3"><i class="bi bi-camera me-2 text-primary"></i>Top Attractions</h5>
+                <div class="row g-2">
+                    @foreach (var a in attractions)
+                    {
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center gap-2 p-2 rounded" style="background:rgba(74,126,194,0.07);">
+                                <i class="bi bi-star-fill text-warning" style="font-size:.75rem;"></i>
+                                <span class="small fw-medium">@a</span>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Recommended Activities -->
+            <div class="card dest-card mb-4 p-4">
+                <h5 class="fw-bold mb-3"><i class="bi bi-lightning me-2 text-primary"></i>Recommended Activities</h5>
+                <ul class="list-unstyled mb-0">
+                    @foreach (var act in activities)
+                    {
+                        <li class="d-flex align-items-start gap-2 mb-2">
+                            <i class="bi bi-check2-circle text-success mt-1" style="font-size:.9rem;"></i>
+                            <span class="small">@act</span>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+
+        <!-- RIGHT: budget + quick info + wishlist -->
+        <div class="col-lg-4">
+
+            <!-- Budget Breakdown -->
+            <div class="card dest-card mb-4 p-4">
+                <h5 class="fw-bold mb-3"><i class="bi bi-wallet2 me-2 text-primary"></i>Budget Guide</h5>
+                <div class="mb-3">
+                    <p class="small fw-semibold text-muted mb-1 text-uppercase" style="font-size:.7rem;letter-spacing:.5px;">Accommodation</p>
+                    <p class="small mb-0">@accommodation</p>
+                </div>
+                <hr class="my-2" style="border-color:var(--card-border);" />
+                <div class="mb-3">
+                    <p class="small fw-semibold text-muted mb-1 text-uppercase" style="font-size:.7rem;letter-spacing:.5px;">Food & Drink</p>
+                    <p class="small mb-0">@food</p>
+                </div>
+                <hr class="my-2" style="border-color:var(--card-border);" />
+                <div class="mb-3">
+                    <p class="small fw-semibold text-muted mb-1 text-uppercase" style="font-size:.7rem;letter-spacing:.5px;">Transport</p>
+                    <p class="small mb-0">@transport</p>
+                </div>
+                <hr class="my-2" style="border-color:var(--card-border);" />
+                <div class="p-3 rounded text-center" style="background:linear-gradient(135deg,var(--blue-4),var(--blue-3));color:#fff;">
+                    <div class="fw-bold" style="font-size:1.1rem;">@dailyBudget</div>
+                    <div class="small opacity-75">estimated daily spend</div>
+                    <hr style="border-color:rgba(255,255,255,0.2);margin:.75rem 0;" />
+                    <div class="fw-semibold small">@totalAvg</div>
+                </div>
+            </div>
+
+            <!-- Quick Info -->
+            <div class="card dest-card mb-4 p-4">
+                <h5 class="fw-bold mb-3"><i class="bi bi-info-circle me-2 text-primary"></i>Quick Info</h5>
+                <div class="d-flex justify-content-between small border-bottom py-2">
+                    <span class="text-muted">Country</span>
+                    <span class="fw-semibold">@Model.CountryName</span>
+                </div>
+                <div class="d-flex justify-content-between small border-bottom py-2">
+                    <span class="text-muted">Best Season</span>
+                    <span class="fw-semibold">@Model.BestSeason</span>
+                </div>
+                <div class="d-flex justify-content-between small py-2">
+                    <span class="text-muted">Est. Budget</span>
+                    <span class="fw-semibold text-success">from $@Model.EstimatedBudget</span>
+                </div>
+            </div>
+
+            <!-- Wishlist / Action buttons -->
+            @if (loggedIn)
+            {
+                <form asp-controller="Wishlist" asp-action="Add" method="post" class="mb-3">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="destinationId" value="@Model.Id" />
+                    <button type="submit" class="btn btn-outline-danger w-100">
+                        <i class="bi bi-heart me-2"></i>Add to Wishlist
+                    </button>
+                </form>
+               <a asp-controller="Trip"
+   asp-action="Create"
+   asp-route-destinationId="@Model.Id"
+   class="btn btn-primary w-100 mb-3">
+    <i class="bi bi-suitcase me-2"></i>Plan a Trip Here
+</a>
+            }
+            else
+            {
+                <div class="card dest-card p-3 text-center mb-3">
+                    <p class="small text-muted mb-2">Sign in to save this destination</p>
+                    <a asp-controller="Account" asp-action="Login" class="btn btn-primary btn-sm w-100 mb-2">Login</a>
+                    <a asp-controller="Account" asp-action="Register" class="btn btn-outline-secondary btn-sm w-100">Register</a>
+                </div>
+            }
+
+            <a asp-controller="Destination" asp-action="Index" class="btn btn-outline-secondary w-100">
+                <i class="bi bi-arrow-left me-2"></i>Back to Destinations
+            </a>
+        </div>
+    </div>
+</div>

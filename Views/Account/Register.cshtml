@@ -1,0 +1,76 @@
+@model TravelPlanner.Models.RegisterViewModel
+@{
+    ViewData["Title"] = "Register";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="card border-0 shadow-sm rounded-4" style="background:var(--card-bg);border:1px solid var(--card-border) !important;">
+                <div class="card-body p-5">
+                    <div class="text-center mb-4">
+                        <div style="width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,var(--blue-3),var(--aurora-teal));display:inline-flex;align-items:center;justify-content:center;margin-bottom:0.75rem;">
+                            <i class="bi bi-person-plus-fill text-white" style="font-size:1.5rem;"></i>
+                        </div>
+                        <h2 class="fw-bold mt-1" style="font-family:'Outfit',sans-serif;">Create Account</h2>
+                        <p class="text-muted small">Start planning your adventures</p>
+                    </div>
+                    <form asp-action="Register" method="post">
+                        @Html.AntiForgeryToken()
+                        <div class="mb-3">
+                            <label asp-for="FullName" class="form-label fw-semibold small">Full Name</label>
+                            <input asp-for="FullName" class="form-control" placeholder="Jane Doe" />
+                            <span asp-validation-for="FullName" class="text-danger small"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="Email" class="form-label fw-semibold small">Email</label>
+                            <input asp-for="Email" class="form-control" placeholder="you@example.com" />
+                            <span asp-validation-for="Email" class="text-danger small"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="Password" class="form-label fw-semibold small">Password</label>
+                            <div class="input-group">
+                                <input asp-for="Password" type="password" id="regPwd" class="form-control" placeholder="Min. 6 characters" />
+                                <button type="button" class="btn btn-outline-secondary" onclick="togglePwd('regPwd','regPwdEye')" tabindex="-1">
+                                    <i id="regPwdEye" class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                            <span asp-validation-for="Password" class="text-danger small"></span>
+                        </div>
+                        <div class="mb-4">
+                            <label asp-for="ConfirmPassword" class="form-label fw-semibold small">Confirm Password</label>
+                            <div class="input-group">
+                                <input asp-for="ConfirmPassword" type="password" id="regConfirmPwd" class="form-control" placeholder="Repeat password" />
+                                <button type="button" class="btn btn-outline-secondary" onclick="togglePwd('regConfirmPwd','regConfirmEye')" tabindex="-1">
+                                    <i id="regConfirmEye" class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                            <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold">Create Account</button>
+                    </form>
+                    <p class="text-center text-muted small mt-4 mb-0">
+                        Already have an account? <a asp-action="Login" style="color:var(--blue-3);">Login here</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        function togglePwd(inputId, iconId) {
+            const input = document.getElementById(inputId);
+            const icon = document.getElementById(iconId);
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.className = 'bi bi-eye-slash';
+            } else {
+                input.type = 'password';
+                icon.className = 'bi bi-eye';
+            }
+        }
+    </script>
+}

@@ -1,0 +1,313 @@
+@model IEnumerable<TravelPlanner.Models.VisaFreeCountry>
+
+@{
+    ViewData["Title"] = "Visa-Free Countries";
+
+    var identityCountries = new[]
+    {
+        "Georgia", "Azerbaijan", "Ukraine"
+    };
+
+    var europe = new[]
+    {
+        "Albania", "Bosnia and Herzegovina", "Montenegro", "Kosovo",
+        "North Macedonia", "Serbia", "Moldova", "Georgia"
+    };
+
+    var asia = new[]
+    {
+        "Japan", "Thailand", "Indonesia", "South Korea",
+        "Qatar", "Malaysia", "Singapore", "Kazakhstan"
+    };
+
+    var africa = new[]
+    {
+        "Morocco", "Tunisia", "South Africa"
+    };
+
+    var southAmerica = new[]
+    {
+        "Brazil", "Argentina", "Chile", "Colombia"
+    };
+
+    var featured = new[]
+    {
+        new { Country = "Japan", City = "Tokyo, Osaka, Kyoto", Duration = "90 Days", Season = "Spring", Budget = 1800, Img = "/images/visa-free/Japan.jpg" },
+        new { Country = "Thailand", City = "Bangkok, Phuket, Chiang Mai", Duration = "30 Days", Season = "Winter", Budget = 900, Img = "/images/visa-free/Thailand.jpg" },
+        new { Country = "Georgia", City = "Tbilisi, Batumi", Duration = "1 Year", Season = "Spring", Budget = 700, Img = "/images/visa-free/Georgia.jpg" },
+        new { Country = "Serbia", City = "Belgrade, Novi Sad", Duration = "90 Days", Season = "Autumn", Budget = 850, Img = "/images/visa-free/Serbia.jpg" },
+        new { Country = "Montenegro", City = "Budva, Kotor", Duration = "90 Days", Season = "Summer", Budget = 1000, Img = "/images/visa-free/Montenegro.jpg" },
+        new { Country = "Bosnia and Herzegovina", City = "Sarajevo, Mostar", Duration = "90 Days", Season = "Spring", Budget = 750, Img = "/images/visa-free/Bosnia.jpg" },
+        new { Country = "Indonesia", City = "Bali, Jakarta", Duration = "30 Days", Season = "Summer", Budget = 1000, Img = "/images/visa-free/Indonesia.jpg" },
+        new { Country = "South Korea", City = "Seoul, Busan", Duration = "90 Days", Season = "Autumn", Budget = 1500, Img = "/images/visa-free/South_Korea.jpg" },
+        new { Country = "Morocco", City = "Marrakesh, Casablanca", Duration = "90 Days", Season = "Spring", Budget = 900, Img = "/images/visa-free/Morocco.jpg" },
+        new { Country = "Brazil", City = "Rio de Janeiro, São Paulo", Duration = "90 Days", Season = "Summer", Budget = 1400, Img = "/images/visa-free/Brazil.jpg" },
+        new { Country = "Qatar", City = "Doha", Duration = "90 Days", Season = "Winter", Budget = 1300, Img = "/images/visa-free/Qatar.jpg" },
+        new { Country = "Malaysia", City = "Kuala Lumpur, Langkawi", Duration = "90 Days", Season = "Winter", Budget = 950, Img = "/images/visa-free/Malaysia.jpg" }
+    };
+}
+
+<div class="container py-5">
+
+    <div class="text-center mb-5">
+        <h1 class="fw-bold">
+            <i class="bi bi-passport me-2 text-primary"></i>Visa-Free Countries
+        </h1>
+        <p class="text-muted lead">
+            Countries Turkish citizens can visit without a visa or with national ID
+        </p>
+    </div>
+
+    <div class="alert alert-warning border-0 shadow-sm mb-5">
+        <h5 class="fw-bold mb-2">
+            <i class="bi bi-exclamation-triangle me-2"></i>Important Travel Notice
+        </h5>
+        <p class="mb-0">
+            Visa-free travel does not always mean unrestricted entry. Entry rules, allowed stay duration
+            and required documents may change, so travelers should always check official information before departure.
+        </p>
+    </div>
+
+    <!-- ID COUNTRIES -->
+    <section class="mb-5">
+        <h2 class="section-title">Countries You Can Visit with Turkish ID</h2>
+
+        <div class="row g-3">
+            @foreach (var country in identityCountries)
+            {
+                <div class="col-md-4">
+                    <div class="country-mini-card">
+                        <div class="d-flex align-items-center mb-3">
+                            <i class="bi bi-person-vcard text-primary me-2 fs-5"></i>
+                            <span class="fw-bold">@country</span>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <form asp-controller="Wishlist"
+                                  asp-action="AddVisaFree"
+                                  method="post"
+                                  class="flex-fill">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="countryName" value="@country" />
+                                <button type="submit" class="btn btn-outline-danger btn-sm w-100">
+                                    <i class="bi bi-heart-fill me-1"></i>Favorite
+                                </button>
+                            </form>
+                            <form asp-controller="Trip"
+                                  asp-action="CreateFromVisaFree"
+                                  method="post"
+                                  class="flex-fill">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="countryName" value="@country" />
+                                <button type="submit" class="btn btn-primary btn-sm w-100">
+                                    <i class="bi bi-suitcase-lg-fill me-1"></i>Plan Trip
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </section>
+
+    <!-- REGIONS -->
+    <section class="mb-5">
+        <h2 class="section-title">Visa-Free Countries by Region</h2>
+
+        <div class="row g-4">
+            @foreach (var region in new[] {
+                new { Name = "Europe",       Items = europe },
+                new { Name = "Asia",         Items = asia },
+                new { Name = "Africa",       Items = africa },
+                new { Name = "South America",Items = southAmerica }
+            })
+            {
+                <div class="col-md-6 col-lg-3">
+                    <div class="region-card h-100">
+                        <h4>@region.Name</h4>
+                        <ul class="list-unstyled region-list">
+                            @foreach (var item in region.Items)
+                            {
+                                <li class="region-list-item">
+                                    <span class="country-name">@item</span>
+                                    <div class="region-btn-group">
+                                        <form asp-controller="Wishlist"
+                                              asp-action="AddVisaFree"
+                                              method="post"
+                                              class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="countryName" value="@item" />
+                                            <button type="submit"
+                                                    class="btn btn-outline-danger btn-xs"
+                                                    title="Add to Favorites">
+                                                <i class="bi bi-heart-fill"></i>
+                                            </button>
+                                        </form>
+                                        <form asp-controller="Trip"
+                                              asp-action="CreateFromVisaFree"
+                                              method="post"
+                                              class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="countryName" value="@item" />
+                                            <button type="submit"
+                                                    class="btn btn-primary btn-xs"
+                                                    title="Plan a Trip">
+                                                <i class="bi bi-suitcase-lg-fill"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+            }
+        </div>
+    </section>
+
+    <!-- FEATURED -->
+    <section>
+        <h2 class="section-title">Featured Visa-Free Destinations</h2>
+
+        <div class="row g-4">
+            @foreach (var c in featured)
+            {
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 border-0 shadow-sm visa-card">
+                        <img src="@c.Img" class="card-img-top" alt="@c.Country" loading="lazy" />
+
+                        <div class="card-body p-4">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <h5 class="fw-bold mb-0">@c.Country</h5>
+                                <span class="badge bg-success">@c.Duration</span>
+                            </div>
+
+                            <ul class="list-unstyled small text-muted mb-0">
+                                <li class="mb-2">
+                                    <i class="bi bi-buildings me-2 text-primary"></i>@c.City
+                                </li>
+                                <li class="mb-2">
+                                    <i class="bi bi-sun me-2 text-warning"></i>Best in @c.Season
+                                </li>
+                                <li>
+                                    <i class="bi bi-currency-dollar me-2 text-success"></i>Est. $@c.Budget
+                                </li>
+                            </ul>
+
+                            <div class="d-flex gap-2 mt-3">
+                                <form asp-controller="Wishlist"
+                                      asp-action="AddVisaFree"
+                                      method="post"
+                                      class="flex-fill">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="countryName" value="@c.Country" />
+                                    <button type="submit" class="btn btn-outline-danger w-100">
+                                        <i class="bi bi-heart-fill me-1"></i>Favorite
+                                    </button>
+                                </form>
+                                <form asp-controller="Trip"
+                                      asp-action="CreateFromVisaFree"
+                                      method="post"
+                                      class="flex-fill">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="countryName" value="@c.Country" />
+                                    <button type="submit" class="btn btn-primary w-100">
+                                        <i class="bi bi-suitcase-lg-fill me-1"></i>Plan Trip
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </section>
+
+</div>
+
+<style>
+    .section-title {
+        font-weight: 800;
+        color: var(--blue-4);
+        margin-bottom: 1.5rem;
+        padding-bottom: .75rem;
+        border-bottom: 3px solid var(--card-border);
+    }
+
+    /* ── ID kartları ── */
+    .country-mini-card {
+        background: #ffffff;
+        border-radius: 18px;
+        padding: 20px 24px;
+        box-shadow: 0 10px 25px rgba(0,0,0,.06);
+        border: 1px solid rgba(13,110,253,.12);
+    }
+
+    /* ── Bölge kartları ── */
+    .region-card {
+        background: #ffffff;
+        border-radius: 18px;
+        padding: 24px;
+        box-shadow: 0 10px 25px rgba(0,0,0,.06);
+        border: 1px solid rgba(13,110,253,.12);
+    }
+
+    .region-card h4 {
+        font-weight: 800;
+        color: var(--blue-4);
+        margin-bottom: 1rem;
+    }
+
+    .region-list {
+        margin-bottom: 0;
+    }
+
+    .region-list-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: .35rem 0;
+        border-bottom: 1px solid rgba(0,0,0,.05);
+        gap: .5rem;
+    }
+
+    .region-list-item:last-child {
+        border-bottom: none;
+    }
+
+    .country-name {
+        color: #5f6f89;
+        font-size: .9rem;
+        flex: 1;
+    }
+
+    .region-btn-group {
+        display: flex;
+        gap: .3rem;
+        flex-shrink: 0;
+    }
+
+    /* Küçük ikon buton */
+    .btn-xs {
+        padding: .2rem .45rem;
+        font-size: .75rem;
+        line-height: 1.2;
+        border-radius: 8px;
+    }
+
+    /* ── Featured kartlar ── */
+    .visa-card {
+        border-radius: 18px;
+        overflow: hidden;
+        transition: .3s;
+    }
+
+    .visa-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .visa-card img {
+        width: 100%;
+        height: 210px;
+        object-fit: cover;
+    }
+</style>

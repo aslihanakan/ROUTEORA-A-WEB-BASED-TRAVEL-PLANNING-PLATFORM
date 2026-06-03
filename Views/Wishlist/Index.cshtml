@@ -1,0 +1,238 @@
+@model IEnumerable<TravelPlanner.Models.WishlistItem>
+@{
+    ViewData["Title"] = "My Wishlist";
+    var destinations = Model.Where(x => x.ItemType == "Destination").ToList();
+    var routes       = Model.Where(x => x.ItemType == "Route").ToList();
+    var visaFree     = Model.Where(x => x.ItemType == "VisaFree").ToList();
+}
+
+<div class="container py-5">
+    <h1 class="fw-bold mb-1"><i class="bi bi-heart-fill text-danger me-2"></i>My Wishlist</h1>
+    <p class="text-muted mb-4">Your saved destinations, routes and visa-free countries</p>
+
+    @if (!Model.Any())
+    {
+        <div class="text-center py-5">
+            <i class="bi bi-heart text-muted" style="font-size:4rem;"></i>
+            <h4 class="mt-3 text-muted">Your wishlist is empty</h4>
+            <p class="text-muted">Browse destinations and click the heart icon to save them here.</p>
+            <div class="d-flex justify-content-center gap-2 flex-wrap">
+                <a asp-controller="Destination" asp-action="Index" class="btn btn-primary">
+                    <i class="bi bi-compass me-1"></i>Explore Destinations
+                </a>
+                <a asp-controller="Destination" asp-action="SuggestedRoutes" class="btn btn-outline-primary">
+                    <i class="bi bi-map me-1"></i>Suggested Routes
+                </a>
+                <a asp-controller="Destination" asp-action="VisaFree" class="btn btn-outline-success">
+                    <i class="bi bi-passport me-1"></i>Visa-Free Countries
+                </a>
+            </div>
+        </div>
+    }
+    else
+    {
+        <!-- Tab navigation -->
+        <ul class="nav nav-tabs mb-4" id="wishlistTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link @(destinations.Any() ? "active" : "")"
+                        id="dest-tab" data-bs-toggle="tab" data-bs-target="#dest-pane"
+                        type="button" role="tab">
+                    <i class="bi bi-geo-alt me-1"></i>Destinations
+                    @if (destinations.Any())
+                    {
+                        <span class="badge bg-primary ms-1">@destinations.Count</span>
+                    }
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link @(!destinations.Any() && routes.Any() ? "active" : "")"
+                        id="routes-tab" data-bs-toggle="tab" data-bs-target="#routes-pane"
+                        type="button" role="tab">
+                    <i class="bi bi-map me-1"></i>Routes
+                    @if (routes.Any())
+                    {
+                        <span class="badge bg-primary ms-1">@routes.Count</span>
+                    }
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link @(!destinations.Any() && !routes.Any() && visaFree.Any() ? "active" : "")"
+                        id="visa-tab" data-bs-toggle="tab" data-bs-target="#visa-pane"
+                        type="button" role="tab">
+                    <i class="bi bi-passport me-1"></i>Visa-Free
+                    @if (visaFree.Any())
+                    {
+                        <span class="badge bg-success ms-1">@visaFree.Count</span>
+                    }
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="wishlistTabContent">
+
+            <!-- ── DESTINATIONS TAB ── -->
+            <div class="tab-pane fade @(destinations.Any() ? "show active" : "")"
+                 id="dest-pane" role="tabpanel">
+                @if (!destinations.Any())
+                {
+                    <div class="text-center py-4 text-muted">
+                        <i class="bi bi-geo-alt" style="font-size:3rem;"></i>
+                        <p class="mt-2">No saved destinations yet.</p>
+                        <a asp-controller="Destination" asp-action="Index" class="btn btn-outline-primary btn-sm">
+                            Explore Destinations
+                        </a>
+                    </div>
+                }
+                else
+                {
+                    <div class="row g-4">
+                        @foreach (var item in destinations)
+                        {
+                            var d = item.Destination;
+                            <div class="col-md-6 col-lg-4">
+                                <div class="card dest-card h-100">
+                                    @if (d != null && !string.IsNullOrEmpty(d.ImageUrl))
+                                    {
+                                        <img src="@d.ImageUrl" class="card-img-top" style="height:180px;object-fit:cover;" alt="@d.CityName" loading="lazy" />
+                                    }
+                                    <div class="card-body d-flex flex-column">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div>
+                                                <h5 class="fw-bold mb-0">@(d?.CityName ?? "Unknown")</h5>
+                                                <p class="text-muted small mb-0">
+                                                    <i class="bi bi-geo-alt me-1"></i>@(d?.CountryName ?? "")
+                                                </p>
+                                            </div>
+                                            <form asp-controller="Wishlist" asp-action="Remove" method="post">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="id" value="@item.Id" />
+                                                <button type="submit" class="btn btn-sm btn-outline-danger border-0" title="Remove">
+                                                    <i class="bi bi-heart-fill"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                        <div class="mt-auto pt-3 d-flex gap-2">
+                                            <a asp-controller="Destination" asp-action="Details" asp-route-id="@item.DestinationId"
+                                               class="btn btn-outline-primary btn-sm flex-grow-1">
+                                                <i class="bi bi-eye me-1"></i>View
+                                            </a>
+                                            <a asp-controller="Trip" asp-action="Create"
+                                               class="btn btn-primary btn-sm flex-grow-1">
+                                                <i class="bi bi-suitcase-lg me-1"></i>Plan Trip
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+
+            <!-- ── ROUTES TAB ── -->
+            <div class="tab-pane fade @(!destinations.Any() && routes.Any() ? "show active" : "")"
+                 id="routes-pane" role="tabpanel">
+                @if (!routes.Any())
+                {
+                    <div class="text-center py-4 text-muted">
+                        <i class="bi bi-map" style="font-size:3rem;"></i>
+                        <p class="mt-2">No saved routes yet.</p>
+                        <a asp-controller="Destination" asp-action="SuggestedRoutes" class="btn btn-outline-primary btn-sm">
+                            Browse Routes
+                        </a>
+                    </div>
+                }
+                else
+                {
+                    <div class="row g-4">
+                        @foreach (var item in routes)
+                        {
+                            <div class="col-md-6 col-lg-4">
+                                <div class="card h-100 border-0 shadow-sm">
+                                    <div class="card-body d-flex flex-column">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <span class="badge bg-primary bg-opacity-10 text-primary px-2 py-1">
+                                                <i class="bi bi-signpost-2 me-1"></i>Route
+                                            </span>
+                                            <form asp-controller="Wishlist" asp-action="Remove" method="post">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="id" value="@item.Id" />
+                                                <button type="submit" class="btn btn-sm btn-outline-danger border-0" title="Remove">
+                                                    <i class="bi bi-heart-fill"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                        <h5 class="fw-bold mb-1">@item.RouteName</h5>
+                                        <p class="text-muted small mt-auto mb-3">
+                                            <i class="bi bi-map me-1"></i>Suggested multi-country route
+                                        </p>
+                                        <a asp-controller="Destination" asp-action="SuggestedRoutes"
+                                           class="btn btn-outline-primary btn-sm w-100">
+                                            <i class="bi bi-arrow-right me-1"></i>View Routes
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+
+            <!-- ── VISA-FREE TAB ── -->
+            <div class="tab-pane fade @(!destinations.Any() && !routes.Any() && visaFree.Any() ? "show active" : "")"
+                 id="visa-pane" role="tabpanel">
+                @if (!visaFree.Any())
+                {
+                    <div class="text-center py-4 text-muted">
+                        <i class="bi bi-passport" style="font-size:3rem;"></i>
+                        <p class="mt-2">No saved visa-free countries yet.</p>
+                        <a asp-controller="Destination" asp-action="VisaFree" class="btn btn-outline-success btn-sm">
+                            Browse Visa-Free Countries
+                        </a>
+                    </div>
+                }
+                else
+                {
+                    <div class="row g-4">
+                        @foreach (var item in visaFree)
+                        {
+                            <div class="col-md-6 col-lg-4">
+                                <div class="card h-100 border-0 shadow-sm">
+                                    <div class="card-body d-flex flex-column">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <span class="badge bg-success bg-opacity-10 text-success px-2 py-1">
+                                                <i class="bi bi-patch-check me-1"></i>Visa Free
+                                            </span>
+                                            <form asp-controller="Wishlist" asp-action="Remove" method="post">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="id" value="@item.Id" />
+                                                <button type="submit" class="btn btn-sm btn-outline-danger border-0" title="Remove">
+                                                    <i class="bi bi-heart-fill"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                        <h5 class="fw-bold mb-1">@item.VisaFreeCountryName</h5>
+                                        <p class="text-muted small mt-auto mb-3">
+                                            <i class="bi bi-geo-alt me-1"></i>No visa required for Turkish passport
+                                        </p>
+                                        <div class="d-flex gap-2">
+                                            <a asp-controller="Destination" asp-action="VisaFree"
+                                               class="btn btn-outline-success btn-sm flex-grow-1">
+                                                <i class="bi bi-eye me-1"></i>View
+                                            </a>
+                                            <a asp-controller="Trip" asp-action="Create"
+                                               class="btn btn-success btn-sm flex-grow-1">
+                                                <i class="bi bi-suitcase-lg me-1"></i>Plan Trip
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+
+        </div><!-- /tab-content -->
+    }
+</div>

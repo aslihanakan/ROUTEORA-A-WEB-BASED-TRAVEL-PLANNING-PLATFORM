@@ -1,0 +1,62 @@
+@model TravelPlanner.Models.LoginViewModel
+@{
+    ViewData["Title"] = "Login";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="card border-0 shadow-sm rounded-4" style="background:var(--card-bg);border:1px solid var(--card-border) !important;">
+                <div class="card-body p-5">
+                    <div class="text-center mb-4">
+                        <div style="width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,var(--blue-4),var(--blue-3));display:inline-flex;align-items:center;justify-content:center;margin-bottom:0.75rem;">
+                            <i class="bi bi-person-fill text-white" style="font-size:1.5rem;"></i>
+                        </div>
+                        <h2 class="fw-bold mt-1" style="font-family:'Outfit',sans-serif;">Welcome back</h2>
+                        <p class="text-muted small">Login to manage your trips</p>
+                    </div>
+                    <form asp-action="Login" method="post">
+                        @Html.AntiForgeryToken()
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small" style="display:@(ViewData.ModelState.IsValid ? "none" : "block")"></div>
+                        <div class="mb-3">
+                            <label asp-for="Email" class="form-label fw-semibold small">Email</label>
+                            <input asp-for="Email" class="form-control" placeholder="you@example.com" />
+                            <span asp-validation-for="Email" class="text-danger small"></span>
+                        </div>
+                        <div class="mb-4">
+                            <label asp-for="Password" class="form-label fw-semibold small">Password</label>
+                            <div class="input-group">
+                                <input asp-for="Password" type="password" id="loginPwd" class="form-control" placeholder="••••••••" />
+                                <button type="button" class="btn btn-outline-secondary" onclick="togglePwd('loginPwd','loginPwdEye')" tabindex="-1">
+                                    <i id="loginPwdEye" class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                            <span asp-validation-for="Password" class="text-danger small"></span>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold">Login</button>
+                    </form>
+                    <p class="text-center text-muted small mt-4 mb-0">
+                        Don't have an account? <a asp-action="Register" style="color:var(--blue-3);">Register here</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        function togglePwd(inputId, iconId) {
+            const input = document.getElementById(inputId);
+            const icon = document.getElementById(iconId);
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.className = 'bi bi-eye-slash';
+            } else {
+                input.type = 'password';
+                icon.className = 'bi bi-eye';
+            }
+        }
+    </script>
+}

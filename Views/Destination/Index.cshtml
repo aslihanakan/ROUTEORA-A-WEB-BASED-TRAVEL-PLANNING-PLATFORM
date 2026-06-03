@@ -1,0 +1,239 @@
+@model IEnumerable<TravelPlanner.Models.Destination>
+
+@{
+    ViewData["Title"] = "Explore Destinations";
+
+    var countries = Model
+        .GroupBy(d => d.CountryName)
+        .Select(g => new
+        {
+            Country = g.Key,
+            Cities = g.ToList()
+        })
+        .ToList();
+
+    const int perPage = 4;
+    var page1 = countries.Take(perPage).ToList();
+    var page2 = countries.Skip(perPage).ToList();
+}
+
+<div class="container py-5">
+
+    <h1 class="fw-bold mb-1">Explore Destinations</h1>
+    <p class="text-muted mb-5">
+        Find your perfect travel destination — 8 countries, 24 cities
+    </p>
+
+    <!-- PAGE 1 -->
+    <div id="dest-page-1" class="dest-page">
+
+        @foreach (var country in page1)
+        {
+            <div class="country-section">
+
+                <h2 class="country-heading">@country.Country</h2>
+
+                <div class="row g-4">
+
+                    @foreach (var city in country.Cities)
+                    {
+                        <div class="col-12 col-md-6 col-lg-4">
+
+                            <div class="card dest-card h-100 shadow-sm">
+
+                                <img src="@city.ImageUrl"
+                                     class="card-img-top"
+                                     alt="@city.CityName"
+                                     loading="lazy" />
+
+                                <div class="card-body">
+
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <h5 class="fw-bold mb-0">@city.CityName</h5>
+
+                                        <span class="badge bg-primary-subtle text-primary">
+                                            @city.BestSeason
+                                        </span>
+                                    </div>
+
+                                    <p class="text-muted small">
+                                        @city.Description
+                                    </p>
+
+                                    <div class="d-flex justify-content-between align-items-center mt-3">
+
+                                        <span class="fw-semibold text-success">
+                                            from $@city.EstimatedBudget
+                                        </span>
+
+                                        <a asp-controller="Destination"
+                                           asp-action="Details"
+                                           asp-route-id="@city.Id"
+                                           class="btn btn-primary btn-sm">
+                                            Details
+                                        </a>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+                    }
+
+                </div>
+
+            </div>
+        }
+
+    </div>
+
+    <!-- PAGE 2 -->
+    <div id="dest-page-2" class="dest-page" style="display:none;">
+
+        @foreach (var country in page2)
+        {
+            <div class="country-section">
+
+                <h2 class="country-heading">@country.Country</h2>
+
+                <div class="row g-4">
+
+                    @foreach (var city in country.Cities)
+                    {
+                        <div class="col-12 col-md-6 col-lg-4">
+
+                            <div class="card dest-card h-100 shadow-sm">
+
+                                <img src="@city.ImageUrl"
+                                     class="card-img-top"
+                                     alt="@city.CityName"
+                                     loading="lazy" />
+
+                                <div class="card-body">
+
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <h5 class="fw-bold mb-0">@city.CityName</h5>
+
+                                        <span class="badge bg-primary-subtle text-primary">
+                                            @city.BestSeason
+                                        </span>
+                                    </div>
+
+                                    <p class="text-muted small">
+                                        @city.Description
+                                    </p>
+
+                                    <div class="d-flex justify-content-between align-items-center mt-3">
+
+                                        <span class="fw-semibold text-success">
+                                            from $@city.EstimatedBudget
+                                        </span>
+
+                                        <a asp-controller="Destination"
+                                           asp-action="Details"
+                                           asp-route-id="@city.Id"
+                                           class="btn btn-primary btn-sm">
+                                            Details
+                                        </a>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+                    }
+
+                </div>
+
+            </div>
+        }
+
+    </div>
+
+    <!-- PAGINATION -->
+    <div class="dest-pagination">
+        <button class="page-btn active" id="page-btn-1" onclick="showPage(1)">1</button>
+        <button class="page-btn" id="page-btn-2" onclick="showPage(2)">2</button>
+    </div>
+
+</div>
+
+<style>
+
+.country-section {
+    margin-bottom: 60px;
+}
+
+.country-heading {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--blue-4);
+    border-bottom: 3px solid var(--card-border);
+    padding-bottom: 12px;
+    margin-bottom: 25px;
+}
+
+.dest-card {
+    border: none;
+    border-radius: 18px;
+    overflow: hidden;
+    transition: .3s;
+}
+
+.dest-card:hover {
+    transform: translateY(-5px);
+}
+
+.dest-card img {
+    width: 100%;
+    height: 240px;
+    object-fit: cover;
+}
+
+.dest-pagination {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 2.5rem;
+}
+
+.page-btn {
+    width: 42px;
+    height: 42px;
+    border-radius: 8px;
+    border: 2px solid var(--blue-3);
+    background: #fff;
+    color: var(--blue-4);
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.page-btn:hover,
+.page-btn.active {
+    background: var(--blue-4);
+    color: #fff;
+    border-color: var(--blue-4);
+}
+
+</style>
+
+@section Scripts {
+<script>
+function showPage(n) {
+    document.querySelectorAll('.dest-page').forEach(el => el.style.display = 'none');
+    document.querySelectorAll('.page-btn').forEach(el => el.classList.remove('active'));
+
+    document.getElementById('dest-page-' + n).style.display = '';
+    document.getElementById('page-btn-' + n).classList.add('active');
+
+    window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+    });
+}
+</script>
+}

@@ -1,0 +1,464 @@
+@model IEnumerable<TravelPlanner.Models.SuggestedRoute>
+
+@{
+    ViewData["Title"] = "Suggested Routes";
+}
+
+@functions {
+    string GetBudgetText(string budgetLevel)
+    {
+        if (budgetLevel == "Budget")
+            return "Prefer hostels, public transport, local restaurants and early flight bookings to keep costs down.";
+        return "Central hotels, faster transfers and more flexible daily activities fit this budget comfortably.";
+    }
+
+    string GetRouteIcon(string routeName)
+    {
+        if (routeName.Contains("Balkan"))       return "bi-globe-europe-africa";
+        if (routeName.Contains("Scandinavia"))  return "bi-snow";
+        if (routeName.Contains("Mediterranean"))return "bi-sun";
+        if (routeName.Contains("Eastern"))      return "bi-building";
+        if (routeName.Contains("Iberian"))      return "bi-brightness-high";
+        if (routeName.Contains("British"))      return "bi-umbrella";
+        if (routeName.Contains("Alpine"))       return "bi-triangle";
+        if (routeName.Contains("Baltic"))       return "bi-water";
+        if (routeName.Contains("French"))       return "bi-balloon-heart";
+        if (routeName.Contains("Adriatic"))     return "bi-tsunami";
+        if (routeName.Contains("Black Sea"))    return "bi-compass";
+        return "bi-compass";
+    }
+}
+
+@{
+    /* ─── Stop record ─── */
+    var allRoutes = new List<(
+        string RouteName, string Countries, string Duration, string BudgetLevel,
+        string Description, string BestTime, string Transport, string Highlights,
+        string EstimatedCost,
+        (string City, string Days, string Highlights2, string Tips)[] Stops
+    )>
+    {
+        /* ══ BUDGET ══════════════════════════════════════════════════════════════ */
+        (
+            "Balkan Explorer",
+            "Serbia → Bosnia → Croatia → Slovenia",
+            "14 days", "Budget",
+            "Hidden gems of the Balkans — from Belgrade's nightlife to Dubrovnik's old-city walls.",
+            "May – September",
+            "FlixBus / BlaBlaCar between cities; local trams & buses within cities.",
+            "UNESCO old towns, Adriatic coast, stunning lakes, affordable food & accommodation",
+            "~€600–900 per person (incl. transport, accommodation & food)",
+            new[]{
+                ("Belgrade, Serbia",    "3 days", "Kalemegdan Fortress, Skadarlija bohemian quarter, Savamala district. Try ćevapi and rakija.", "Use BlaBlaCar or FlixBus between cities — very cheap."),
+                ("Sarajevo, Bosnia",    "3 days", "Baščaršija bazaar, Latin Bridge, War Tunnel Museum. Don't miss Bosnian coffee.",               "Book accommodation near the old town for easy walking access."),
+                ("Split, Croatia",      "3 days", "Diocletian's Palace (UNESCO), Marjan Hill sunset, ferry to Hvar island.",                       "Visit Plitvice Lakes on a day trip — book tickets online in advance."),
+                ("Ljubljana, Slovenia", "2 days", "Ljubljana Castle, Tivoli Park, Triple Bridge. Day trip to Lake Bled.",                           "Rent a bike — the city is compact and very cycling-friendly."),
+            }
+        ),
+        (
+            "Eastern Europe Circuit",
+            "Poland → Czech Republic → Hungary → Romania",
+            "16 days", "Budget",
+            "Gothic spires, thermal baths, dark history and some of Europe's most underrated cities.",
+            "April–May or September–October",
+            "RegioJet or FlixBus trains/coaches between cities — comfortable and very affordable.",
+            "Medieval architecture, thermal baths, excellent food value, rich WWII history",
+            "~€700–1000 per person (incl. transport, accommodation & food)",
+            new[]{
+                ("Kraków, Poland",              "3 days", "Wawel Castle, Kazimierz Jewish quarter, Wieliczka Salt Mine, Auschwitz memorial.",    "Auschwitz visit is emotionally significant — book a guided tour in advance."),
+                ("Prague, Czech Republic",      "4 days", "Charles Bridge at dawn, Prague Castle, Old Town Square & Astronomical Clock.",        "Climb the castle steps at sunrise — no crowds and an extraordinary view."),
+                ("Budapest, Hungary",           "4 days", "Széchenyi Thermal Baths, Fisherman's Bastion, ruin bars, Danube cruise.",            "Ruin bars are unique to Budapest — Szimpla Kert is the original and best."),
+                ("Bucharest & Brașov, Romania", "3 days", "Palace of Parliament, Old Town Lipscani, Bran Castle, Sinaia mountain resort.",      "Take the train Bucharest–Brașov for €8 and explore Transylvania affordably."),
+            }
+        ),
+        (
+            "Baltic Sea Loop",
+            "Estonia → Latvia → Lithuania → Poland",
+            "12 days", "Budget",
+            "Medieval old towns, Soviet history, amber beaches and Europe's least-visited gems.",
+            "May – August",
+            "Lux Express coach between all four cities — comfortable, Wi-Fi, very affordable.",
+            "Best-preserved medieval old towns, Soviet Cold War sites, amber coast, budget-friendly",
+            "~€550–800 per person (incl. transport, accommodation & food)",
+            new[]{
+                ("Tallinn, Estonia",  "3 days", "Toompea Hill, Alexander Nevsky Cathedral, Viru Gate, medieval town hall, Kadriorg Park.", "Tallinn's old town is extremely walkable and almost entirely pedestrianised."),
+                ("Riga, Latvia",      "3 days", "Riga Central Market (Zeppelin hangars), Art Nouveau district, Freedom Monument, Jūrmala beach.", "Riga has more Art Nouveau buildings than any other city — do a walking tour."),
+                ("Vilnius, Lithuania","3 days", "Gediminas Tower, Užupis Republic (artists' quarter), Gates of Dawn, baroque old town.",    "Every street has a church — Vilnius is called the 'Baroque pearl of the Baltics'."),
+                ("Gdańsk, Poland",    "3 days", "Long Market & Neptune Fountain, WWII Museum, Solidarity Museum, amber jewellery workshops.", "Try Baltic smoked fish at the central market — incredibly fresh and cheap."),
+            }
+        ),
+
+        /* ══ COMFORT ══════════════════════════════════════════════════════════════ */
+        (
+            "Mediterranean Sun",
+            "Italy → Greece → Turkey",
+            "21 days", "Comfort",
+            "Ancient ruins, turquoise seas and incredible cuisine across three iconic civilisations.",
+            "April–June or September–October",
+            "Budget flights Rome–Athens; ferry Athens–Santorini; Turkish Airlines or ferry to Istanbul.",
+            "Colosseum, Acropolis, Santorini sunsets, Bosphorus, ancient ruins, olive oil & fresh seafood",
+            "~€2000–2800 per person (incl. flights, hotels & dining)",
+            new[]{
+                ("Rome, Italy",            "4 days", "Colosseum, Vatican & Sistine Chapel, Trevi Fountain, Trastevere neighbourhood.",          "Book Vatican & Colosseum skip-the-line tickets at least 2 weeks ahead."),
+                ("Naples & Amalfi, Italy", "3 days", "Pompeii ruins, Positano cliffside village, limoncello tasting, authentic Neapolitan pizza.", "Rent a scooter for the Amalfi Coast — buses get very crowded in summer."),
+                ("Athens, Greece",         "3 days", "Acropolis & Parthenon, Plaka neighbourhood, National Archaeological Museum, rooftop bars.", "Visit the Acropolis at 8 am to avoid crowds and midday heat."),
+                ("Santorini, Greece",      "3 days", "Oia sunset, Akrotiri archaeological site, volcanic beaches, wine tasting.",                "Stay in Imerovigli for Caldera views at lower prices than Oia."),
+                ("Istanbul, Turkey",       "4 days", "Hagia Sophia, Grand Bazaar, Bosphorus cruise, Spice Bazaar, Topkapi Palace, Galata Tower.", "Get an Istanbulkart for all trams, metro & ferries. Stay in Sultanahmet or Karaköy."),
+            }
+        ),
+        (
+            "Scandinavian Adventure",
+            "Denmark → Sweden → Norway → Finland",
+            "18 days", "Comfort",
+            "Fjords, aurora borealis, design culture and the happiest cities on Earth.",
+            "Jun–Aug for midnight sun; Dec–Feb for Northern Lights",
+            "Scandinavian rail pass; budget airlines (Norwegian, SAS) for longer legs.",
+            "Fjords, midnight sun, world-class design, Viking history, cleanest cities in Europe",
+            "~€2800–3800 per person (incl. flights, hotels & dining — Scandinavia is expensive!)",
+            new[]{
+                ("Copenhagen, Denmark","3 days", "Nyhavn harbour, Tivoli Gardens, Freetown Christiania, world-class design museums.",  "Get a Copenhagen Card — free museum entry and unlimited public transport."),
+                ("Stockholm, Sweden", "3 days", "Gamla Stan old town, Vasa Museum, Djurgården island, ABBA Museum.",                   "Take the archipelago ferry for a scenic alternative to the bridge crossing."),
+                ("Bergen, Norway",    "3 days", "Bryggen Wharf (UNESCO), Fløibanen funicular, gateway to Norwegian fjords.",           "Take the Norway in a Nutshell tour for the most scenic fjord experience."),
+                ("Oslo, Norway",      "3 days", "Vigeland Sculpture Park, Oslo Opera House rooftop, Munch Museum, Aker Brygge.",       "Oslo Pass covers all museums and public transit — good value for sightseers."),
+                ("Helsinki, Finland", "3 days", "Suomenlinna sea fortress, Helsinki Cathedral, design district, sauna culture.",       "Try a public sauna experience — it's a core part of Finnish life."),
+            }
+        ),
+        (
+            "Iberian Peninsula",
+            "Portugal → Spain",
+            "14 days", "Comfort",
+            "Fado, flamenco, world-class food and wine, golden coastlines and Moorish palaces.",
+            "March–May or September–November",
+            "Renfe train Porto–Lisbon; budget flights or Renfe AVE high-speed Seville–Barcelona.",
+            "Moorish palaces, Atlantic & Mediterranean coasts, world's best tapas & wine, Gaudí",
+            "~€1600–2200 per person (incl. flights, hotels & dining)",
+            new[]{
+                ("Lisbon, Portugal",  "3 days", "Alfama & São Jorge Castle, Belém Tower & Jerónimos Monastery, Sintra day trip, LX Factory.", "Get a Viva Viagem card for trams, metro & ferries. Wear comfortable shoes — very hilly!"),
+                ("Porto, Portugal",   "2 days", "Ribeira waterfront (UNESCO), port wine cellars in Vila Nova de Gaia, Livraria Lello.",        "Do a free port wine tasting tour — most lodges offer one with a purchase."),
+                ("Seville, Spain",    "3 days", "Real Alcázar palace, Seville Cathedral & La Giralda, Triana neighbourhood, flamenco show.",   "Book the Alcázar online — queues can be 2 hours without a ticket."),
+                ("Granada, Spain",    "2 days", "Alhambra Palace & Generalife gardens (UNESCO), Albaicín Moorish quarter, free tapas culture.", "Alhambra tickets sell out weeks ahead — book the moment you plan this trip."),
+                ("Barcelona, Spain",  "4 days", "Sagrada Família, Park Güell, La Boqueria, Gothic Quarter, Barceloneta beach, El Born.",       "Sagrada Família entry must be booked online. Visit Park Güell at opening time."),
+            }
+        ),
+        (
+            "British Isles Explorer",
+            "England → Scotland → Ireland",
+            "16 days", "Comfort",
+            "Royal history, wild highlands, cosy pubs and Europe's most dramatic landscapes.",
+            "May – September",
+            "Avanti/LNER train London–Edinburgh; budget flight or ferry Edinburgh–Dublin; rental car for Highlands.",
+            "Royal palaces, Highland scenery, whisky distilleries, Guinness, incredible pub culture",
+            "~€2200–3000 per person (incl. flights, hotels & dining)",
+            new[]{
+                ("London, England",       "4 days", "British Museum (free), Tower of London, Borough Market, South Bank, Notting Hill.",  "Most national museums are free. Get an Oyster card for the tube and buses."),
+                ("Edinburgh, Scotland",   "3 days", "Edinburgh Castle, Royal Mile, Arthur's Seat hike, Scotch Whisky Experience.",        "If visiting in August, the Fringe Festival transforms the city — book early."),
+                ("Scottish Highlands",    "3 days", "Loch Ness & Urquhart Castle, Eilean Donan Castle, Glencoe valley, Isle of Skye.",   "Rent a car for the Highlands — public transport is very limited outside main towns."),
+                ("Dublin, Ireland",       "3 days", "Trinity College & Book of Kells, Guinness Storehouse, Temple Bar, Phoenix Park.",    "Pubs close at 11:30 pm — arrive by 9 pm to enjoy the atmosphere."),
+            }
+        ),
+        (
+            "Alpine Grand Tour",
+            "Switzerland → Austria → Germany",
+            "12 days", "Comfort",
+            "Snow-capped peaks, fairy-tale castles, beer halls and Europe's most scenic train rides.",
+            "Dec–Mar for skiing; Jun–Sep for hiking",
+            "Swiss Travel Pass for Switzerland; ÖBB Railjet Austria–Germany.",
+            "Alpine peaks, Jungfraujoch, Mozart's Salzburg, Bavarian castles, world-class skiing",
+            "~€2400–3200 per person (incl. flights, hotels & mountain activities)",
+            new[]{
+                ("Zurich & Lucerne, Switzerland",        "3 days", "Lake Lucerne, Chapel Bridge, Mount Pilatus cable car, Zurich old town.",           "Swiss Travel Pass gives unlimited rail, bus & boat travel — buy before arriving."),
+                ("Interlaken & Jungfrau, Switzerland",   "2 days", "Jungfraujoch 'Top of Europe' (3,454 m), Eiger North Face views, paragliding.",    "Go on a weekday and check the weather forecast the night before."),
+                ("Innsbruck, Austria",                   "2 days", "Golden Roof, Nordkette cable car to 2,300 m, Imperial Palace, Tirolean cuisine.",  "Innsbruck Card covers all cable cars and museums — great value."),
+                ("Salzburg, Austria",                    "2 days", "Hohensalzburg Fortress, Mirabell Gardens, Mozart's birthplace, Hallstatt.",        "Hallstatt is stunning but crowded — arrive before 9 am or after 4 pm."),
+                ("Munich, Germany",                      "3 days", "Marienplatz & Glockenspiel, English Garden beer garden, BMW Museum, Nymphenburg.", "Late Sep / early Oct = Oktoberfest — book accommodation months ahead."),
+            }
+        ),
+        (
+            "French Riviera & Côte d'Azur",
+            "France → Monaco → Italy (Cinque Terre)",
+            "12 days", "Comfort",
+            "Glamorous seaside towns, world-class cuisine, lavender fields and turquoise Mediterranean bays.",
+            "May–June or September (avoid August crowds & peak prices)",
+            "TGV Paris–Nice; regional train along the coast; ferry or train to Cinque Terre.",
+            "Nice Promenade, Monaco Grand Prix circuit, Cannes Croisette, Cinque Terre cliffside villages",
+            "~€2200–3000 per person (incl. flights, hotels & dining)",
+            new[]{
+                ("Paris, France",           "3 days", "Eiffel Tower, Louvre, Montmartre, Le Marais district, Seine river cruise.",              "Book the Louvre online and visit on a Wednesday or Friday evening (open late)."),
+                ("Nice, France",            "3 days", "Promenade des Anglais, Vieux-Nice old town, Matisse Museum, day trip to Èze village.",   "Buy a weekly bus/tram pass — covers all Côte d'Azur coastal routes cheaply."),
+                ("Monaco",                  "1 day",  "Casino de Monte-Carlo exterior, Prince's Palace, Oceanographic Museum, Formula 1 circuit.", "Entry to the Casino floor requires smart dress. The museum is the highlight."),
+                ("Cannes & Antibes, France","2 days", "Cannes Croisette & Palais des Festivals, Antibes old town, Picasso Museum, Île Sainte-Marguerite.", "Take the 10-minute ferry to Île Sainte-Marguerite for peaceful beaches away from the crowds."),
+                ("Cinque Terre, Italy",     "3 days", "Vernazza & Manarola cliff villages, coastal hiking trail, fresh pesto pasta, boat trips.", "Buy the Cinque Terre Card — covers the hiking trail and local trains between villages."),
+            }
+        ),
+        (
+            "Adriatic Pearl Route",
+            "Croatia → Montenegro → Albania",
+            "14 days", "Comfort",
+            "Crystal-clear Adriatic waters, Venetian-era old towns and unspoilt Balkan coastlines.",
+            "June or September (best weather, fewer crowds than July–August)",
+            "Budget flights to Dubrovnik or Split; local buses & ferries along the coast.",
+            "Dubrovnik old city walls, Kotor Bay, Bay of Kotor UNESCO site, Albanian Riviera hidden beaches",
+            "~€1400–1900 per person (incl. flights, hotels & dining)",
+            new[]{
+                ("Dubrovnik, Croatia",     "3 days", "Old City Walls walk, Lokrum Island ferry, Game of Thrones filming locations, cable car to Srđ hill.", "Walk the city walls at sunrise — golden light, no crowds, and the best photos."),
+                ("Split & Hvar, Croatia",  "3 days", "Diocletian's Palace (a living city within Roman walls), Hvar town & lavender fields, blue cave.",   "Ferry Split–Hvar takes 1 hour — stay overnight on Hvar rather than day-tripping."),
+                ("Kotor, Montenegro",      "3 days", "Kotor Bay (UNESCO), medieval old town, St John's Fortress hike, Perast village & Our Lady of the Rocks.", "The hike to St John's Fortress takes 45 min and the bay view from the top is extraordinary."),
+                ("Shkodër & Theth, Albania","2 days","Shkodër Castle, traditional guesthouses (bujtina), Theth National Park mountain scenery.",             "Albania is remarkably affordable — a full dinner with wine costs around €8–12."),
+                ("Albanian Riviera",       "3 days", "Sarandë, Ksamil islands (tiny beaches, snorkelling), UNESCO Butrint ancient ruins, Gjirokastër castle town.", "Ksamil is one of Europe's most beautiful beaches — hire a pedalo to reach the small islands."),
+            }
+        ),
+        (
+            "Black Sea & Caucasus Explorer",
+            "Turkey → Georgia → Armenia",
+            "18 days", "Comfort",
+            "Ancient monasteries, dramatic mountain landscapes and some of the world's oldest wine cultures.",
+            "May–June or September–October",
+            "Turkish Airlines Istanbul–Tbilisi; Marshrutka minibuses within Georgia & Armenia; shared taxi across borders.",
+            "Cappadocia fairy chimneys, Vardzia cave monastery, Kazbegi mountains, Lake Sevan, Armenian Apostolic churches",
+            "~€1800–2400 per person (incl. flights, hotels & dining)",
+            new[]{
+                ("Istanbul & Cappadocia, Turkey","4 days","Hagia Sophia, Grand Bazaar, then fly to Cappadocia — hot air balloon over fairy chimneys at sunrise, underground cities of Derinkuyu.", "Book the hot air balloon at least 1 week ahead — it sells out fast and weather cancellations are common."),
+                ("Tbilisi, Georgia",             "4 days","Narikala Fortress, old town sulphur baths, Rustaveli Avenue, Georgian wine & khinkali dumplings, Mtatsminda funicular.", "Georgia has some of the world's oldest winemaking traditions — do a Kakheti wine region day trip."),
+                ("Kazbegi (Stepantsminda), Georgia","3 days","Gergeti Trinity Church (2,170 m), Caucasus mountain trekking, glacier walks, traditional Tusheti villages.", "Hire a 4×4 from Tbilisi — the road to Kazbegi is dramatic and the views are jaw-dropping."),
+                ("Yerevan, Armenia",             "4 days","Republic Square & dancing fountains, Armenian Genocide Memorial, Cascade complex, Brandy factory tour.", "Try lavash bread-making at a local family — it's UNESCO-listed intangible heritage."),
+                ("Lake Sevan & Geghard, Armenia","3 days","Sevanavank monastery on the lake peninsula, Geghard cave monastery (UNESCO), Symphony of Stones basalt columns.", "Hire a car or join a day tour from Yerevan — distances are manageable but public buses are slow."),
+            }
+        ),
+    };
+}
+
+<div class="container py-5">
+
+    <div class="text-center mb-5">
+        <h1 class="fw-bold">
+            <i class="bi bi-map me-2 text-primary"></i>Suggested Routes ⭐
+        </h1>
+        <p class="text-muted lead">
+            Ready-made multi-country itineraries for every travel style
+        </p>
+    </div>
+
+    @* ── Filter bar ── *@
+    <div class="d-flex flex-wrap gap-2 justify-content-center mb-4">
+        <button class="btn btn-sm btn-outline-secondary filter-btn active" data-filter="all">All Routes</button>
+        <button class="btn btn-sm btn-outline-success filter-btn" data-filter="Budget">
+            <i class="bi bi-piggy-bank me-1"></i>Budget
+        </button>
+        <button class="btn btn-sm btn-outline-primary filter-btn" data-filter="Comfort">
+            <i class="bi bi-stars me-1"></i>Comfort
+        </button>
+    </div>
+
+    <div class="row g-4" id="routeGrid">
+
+        @for (int ri = 0; ri < allRoutes.Count; ri++)
+        {
+            var r          = allRoutes[ri];
+            var collapseId = "routeDetails" + ri;
+
+            <div class="col-lg-6 route-item" data-budget="@r.BudgetLevel">
+                <div class="card h-100 border-0 shadow-sm route-card">
+
+                    <div class="route-card-stripe @(r.BudgetLevel == "Budget" ? "stripe-budget" : "stripe-comfort")"></div>
+
+                    <div class="card-body p-4">
+
+                        @* Title row *@
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="route-icon-wrap @(r.BudgetLevel == "Budget" ? "icon-budget" : "icon-comfort")">
+                                    <i class="bi @GetRouteIcon(r.RouteName)"></i>
+                                </span>
+                                <h5 class="fw-bold mb-0">@r.RouteName</h5>
+                            </div>
+                            <span class="badge @(r.BudgetLevel == "Budget" ? "bg-success" : "bg-primary")">
+                                @r.BudgetLevel
+                            </span>
+                        </div>
+
+                        <p class="text-primary fw-semibold mb-2 small">
+                            <i class="bi bi-arrow-right-circle me-1"></i>@r.Countries
+                        </p>
+
+                        <p class="text-muted small mb-3">@r.Description</p>
+
+                        @* Meta row *@
+                        <div class="d-flex gap-3 text-muted small mb-2 flex-wrap">
+                            <span><i class="bi bi-clock me-1"></i>@r.Duration</span>
+                            <span><i class="bi bi-calendar3 me-1"></i>@r.BestTime</span>
+                        </div>
+
+                        @* Cost badge *@
+                        <div class="mb-3">
+                            <span class="cost-badge">
+                                <i class="bi bi-wallet2 me-1"></i>@r.EstimatedCost
+                            </span>
+                        </div>
+
+                        @* Action buttons *@
+                        <div class="d-flex flex-wrap gap-2">
+                            <button class="btn btn-outline-primary btn-sm flex-fill"
+                                    type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#@collapseId"
+                                    aria-expanded="false">
+                                <i class="bi bi-info-circle me-1"></i>Details
+                            </button>
+
+                            <form asp-controller="Wishlist" asp-action="AddRoute" method="post" class="flex-fill">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="routeName" value="@r.RouteName" />
+                                <button type="submit" class="btn btn-outline-danger btn-sm w-100">
+                                    <i class="bi bi-heart-fill me-1"></i>Favourite
+                                </button>
+                            </form>
+
+                            <form asp-controller="Trip" asp-action="CreateFromRoute" method="post" class="flex-fill">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="routeName" value="@r.RouteName" />
+                                <button type="submit" class="btn btn-primary btn-sm w-100">
+                                    <i class="bi bi-suitcase-lg-fill me-1"></i>Plan Trip
+                                </button>
+                            </form>
+                        </div>
+
+                        @* Collapsible detail panel *@
+                        <div class="collapse mt-4" id="@collapseId">
+                            <div class="route-detail-box">
+
+                                <h6 class="fw-bold mb-3">
+                                    <i class="bi bi-calendar-check me-1 text-primary"></i>Suggested Itinerary
+                                </h6>
+
+                                <div class="timeline mb-4">
+                                    @for (int si = 0; si < r.Stops.Length; si++)
+                                    {
+                                        var stop   = r.Stops[si];
+                                        var isLast = si == r.Stops.Length - 1;
+                                        <div class="timeline-item @(isLast ? "timeline-item-last" : "")">
+                                            <div class="timeline-dot">@(si + 1)</div>
+                                            <div class="timeline-content">
+                                                <div class="fw-semibold small">
+                                                    @stop.City
+                                                    <span class="badge bg-light text-secondary border ms-1">@stop.Days</span>
+                                                </div>
+                                                <div class="text-muted" style="font-size:.80rem;margin-top:3px;">@stop.Highlights2</div>
+                                                <div class="tip-box mt-2">
+                                                    <i class="bi bi-lightbulb-fill text-warning me-1"></i>
+                                                    <span style="font-size:.78rem;">@stop.Tips</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+
+                                <h6 class="fw-bold mb-2">
+                                    <i class="bi bi-wallet2 me-1 text-success"></i>Estimated Cost
+                                </h6>
+                                <p class="small text-muted mb-1">@r.EstimatedCost</p>
+                                <p class="small text-muted mb-3">@GetBudgetText(r.BudgetLevel)</p>
+
+                                <h6 class="fw-bold mb-2">
+                                    <i class="bi bi-train-front me-1 text-info"></i>Getting Around
+                                </h6>
+                                <p class="small text-muted mb-3">@r.Transport</p>
+
+                                <h6 class="fw-bold mb-2">
+                                    <i class="bi bi-star-fill me-1 text-warning"></i>Must-See Highlights
+                                </h6>
+                                <div class="d-flex flex-wrap gap-1 mb-0">
+                                    @foreach (var hl in r.Highlights.Split(","))
+                                    {
+                                        <span class="badge rounded-pill bg-light text-secondary border">@hl.Trim()</span>
+                                    }
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        }
+
+    </div>
+</div>
+
+<style>
+    .route-card {
+        border-radius: 18px;
+        transition: transform .25s, box-shadow .25s;
+        overflow: hidden;
+    }
+    .route-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 32px rgba(0,0,0,.12) !important;
+    }
+    .route-card-stripe { height: 5px; }
+    .stripe-budget  { background: linear-gradient(90deg,#198754,#20c997); }
+    .stripe-comfort { background: linear-gradient(90deg,#0d6efd,#6610f2); }
+
+    .route-icon-wrap {
+        width: 34px; height: 34px; border-radius: 10px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1rem; flex-shrink: 0;
+    }
+    .icon-budget  { background:rgba(25,135,84,.12);  color:#198754; }
+    .icon-comfort { background:rgba(13,110,253,.12); color:#0d6efd; }
+
+    .cost-badge {
+        display: inline-block;
+        background: #f0f9f4;
+        color: #146c43;
+        border: 1px solid #a3d9b7;
+        border-radius: 20px;
+        padding: 3px 12px;
+        font-size: .78rem;
+        font-weight: 600;
+    }
+
+    /* Timeline */
+    .timeline { position: relative; padding-left: 0; }
+    .timeline-item {
+        display: flex; gap: 14px; position: relative; padding-bottom: 16px;
+    }
+    .timeline-item::before {
+        content:''; position:absolute; left:15px; top:28px; bottom:0;
+        width:2px; background:#dee2e6;
+    }
+    .timeline-item-last::before { display:none; }
+    .timeline-dot {
+        width:32px; height:32px; border-radius:50%;
+        background:#0d6efd; color:#fff;
+        font-size:.75rem; font-weight:700;
+        display:flex; align-items:center; justify-content:center;
+        flex-shrink:0; position:relative; z-index:1;
+    }
+    .timeline-content { flex:1; padding-top:5px; }
+    .tip-box {
+        background:#fffbea; border-left:3px solid #ffc107;
+        border-radius:0 6px 6px 0; padding:5px 8px;
+    }
+
+    .route-detail-box {
+        background:#f6f9ff;
+        border:1px solid rgba(13,110,253,.15);
+        border-radius:16px; padding:20px;
+    }
+    .route-card .btn { border-radius:10px; font-weight:600; }
+
+    .filter-btn.active { background-color:#0d6efd; color:#fff; border-color:#0d6efd; }
+</style>
+
+<script>
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', function () {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            const filter = this.dataset.filter;
+            document.querySelectorAll('.route-item').forEach(card => {
+                card.style.display = (filter === 'all' || card.dataset.budget === filter) ? '' : 'none';
+            });
+        });
+    });
+</script>
